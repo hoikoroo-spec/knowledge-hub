@@ -1,3 +1,4 @@
+export const config={api:{bodyParser:false}};
 const DB='4574e726dab04a09a9e95bf426332098';
 const ORIGIN='https://hoikoroo-spec.github.io';
 const headers={Authorization:'Bearer '+(process.env.NOTION_TOKEN||''),'Notion-Version':'2022-06-28'};
