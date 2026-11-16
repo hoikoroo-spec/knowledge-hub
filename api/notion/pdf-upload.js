@@ -1,16 +1,16 @@
 export const config={api:{bodyParser:false}};
 const DB='4574e726dab04a09a9e95bf426332098';
-const ORIGIN='https://hoikoroo-spec.github.io';
+const ALLOWED_ORIGINS=new Set(['https://hoikoroo-spec.github.io','https://knowledge-hub-hoikoroo-6618.vercel.app']);
 const headers={Authorization:'Bearer '+(process.env.NOTION_TOKEN||''),'Notion-Version':'2022-06-28'};
 export default async function handler(req,res){
  res.setHeader('Cache-Control','no-store');
- res.setHeader('Access-Control-Allow-Origin',ORIGIN);
+ if(ALLOWED_ORIGINS.has(req.headers.origin))res.setHeader('Access-Control-Allow-Origin',req.headers.origin);
  res.setHeader('Access-Control-Allow-Methods','POST,OPTIONS');
  res.setHeader('Access-Control-Allow-Headers','Authorization,Content-Type,X-PDF-Filename');
  res.setHeader('Vary','Origin');
  if(req.method==='OPTIONS')return res.status(204).end();
  if(req.method!=='POST')return res.status(405).json({error:'POSTのみ対応'});
- if(req.headers.origin!==ORIGIN)return res.status(403).json({error:'許可されていない送信元です'});
+ if(req.headers.origin&&!ALLOWED_ORIGINS.has(req.headers.origin))return res.status(403).json({error:'許可されていない送信元です'});
  if(!process.env.NOTION_TOKEN||!process.env.APP_ACCESS_KEY)return res.status(503).json({error:'連携設定がありません'});
  if(req.headers.authorization!=='Bearer '+process.env.APP_ACCESS_KEY)return res.status(401).json({error:'アクセスキーが違います'});
  const filename=decodeURIComponent(req.headers['x-pdf-filename']||'');
